@@ -1,0 +1,69 @@
+name: Daily Internship Scraper
+
+on:
+  schedule:
+    # Runs at 9 AM Eastern Time (1 PM UTC in winter, 2 PM UTC in summer)
+    # Adjust based on your timezone
+    - cron: "0 14 * * *"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  scrape-internships:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Download previous cache
+        uses: actions/cache@v3
+        with:
+          path: seen_postings.json
+          key: postings-cache-${{ github.run_id }}
+          restore-keys: |
+            postings-cache-
+
+      - name: Run scraper
+        env:
+          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_RECEIVER: ${{ secrets.EMAIL_RECEIVER }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          python internship_scraper.py
+
+      - name: Save cache for next run
+        uses: actions/cache/save@v3
+        if: always()
+        with:
+          path: seen_postings.json
+          key: postings-cache-${{ github.run_id }}
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scraper-logs-${{ github.run_number }}
+          path: |
+            seen_postings.json
+          retention-days: 30
