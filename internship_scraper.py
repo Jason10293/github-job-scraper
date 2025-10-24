@@ -20,7 +20,7 @@ class InternshipScraper:
         
         # Popular repos for Canadian internships
         self.repos_to_check = [
-            'negarprh/Canadian-Tech-Internships-2026?tab=readme-ov-file',
+            'negarprh/Canadian-Tech-Internships-2026',
             'lucianlavric/CanadaTechInternships-Summer2026',
             'SimplifyJobs/Summer2026-Internships'
         ]
