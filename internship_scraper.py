@@ -205,20 +205,11 @@ class InternshipScraper:
         msg['From'] = self.email_sender
         msg['To'] = self.email_receiver
         
-        # Create simple text email body
-        text_content = f"{len(postings)} New Canadian Internship Posting(s)\n"
-        text_content += f"Found on {datetime.now().strftime('%B %d, %Y')}\n\n"
+        # Create simple text email body - just links
+        text_content = f"{len(postings)} New Canadian Internship Posting(s)\n\n"
         
         for i, posting in enumerate(postings, 1):
-            text_content += f"#{i}\n"
-            text_content += f"Company: {posting['company']}\n"
-            text_content += f"Role: {posting['role']}\n"
-            text_content += f"Location: {posting['location']}\n"
-            text_content += f"Posted: {posting['date_posted']}\n"
-            text_content += f"Apply: {posting['link']}\n"
-            text_content += f"Source: {posting['repo']}\n\n"
-        
-        text_content += "Good luck with your applications!"
+            text_content += f"{i}. {posting['link']}\n"
         
         msg.attach(MIMEText(text_content, 'plain'))
         
