@@ -20,9 +20,10 @@ class InternshipScraper:
         
         # Popular repos for Canadian internships
         self.repos_to_check = [
-            'negarprh/Canadian-Tech-Internships-2026?tab=readme-ov-file',
-            'lucianlavric/CanadaTechInternships-Summer2026',
-            'SimplifyJobs/Summer2026-Internships'
+            'jenndryden/Canadian-Tech-Internships-Summer-2025',
+            'SimplifyJobs/Summer2025-Internships',
+            'pittcsc/Summer2025-Internships',
+            'ReaVNaiL/New-Grad-2025'
         ]
         
         self.cache_file = 'seen_postings.json'
@@ -204,36 +205,22 @@ class InternshipScraper:
         msg['From'] = self.email_sender
         msg['To'] = self.email_receiver
         
-        # Create simple HTML email body
-        html_content = f"""
-        <html>
-        <body style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
-            <h2>🇨🇦 {len(postings)} New Canadian Internship Posting(s)</h2>
-            <p>Found on {datetime.now().strftime("%B %d, %Y")}</p>
-            <hr>
-        """
+        # Create simple text email body
+        text_content = f"{len(postings)} New Canadian Internship Posting(s)\n"
+        text_content += f"Found on {datetime.now().strftime('%B %d, %Y')}\n\n"
         
         for i, posting in enumerate(postings, 1):
-            html_content += f"""
-            <div style="margin: 20px 0; padding: 15px; background-color: #f5f5f5; border-radius: 5px;">
-                <p style="margin: 5px 0;"><strong>#{i}</strong></p>
-                <p style="margin: 5px 0;"><strong>Company:</strong> {posting['company']}</p>
-                <p style="margin: 5px 0;"><strong>Role:</strong> {posting['role']}</p>
-                <p style="margin: 5px 0;"><strong>Location:</strong> {posting['location']}</p>
-                <p style="margin: 5px 0;"><strong>Posted:</strong> {posting['date_posted']}</p>
-                <p style="margin: 5px 0;"><strong>Apply:</strong> <a href="{posting['link']}">Application Link</a></p>
-                <p style="margin: 5px 0; font-size: 12px; color: #666;">Source: {posting['repo']}</p>
-            </div>
-            """
+            text_content += f"#{i}\n"
+            text_content += f"Company: {posting['company']}\n"
+            text_content += f"Role: {posting['role']}\n"
+            text_content += f"Location: {posting['location']}\n"
+            text_content += f"Posted: {posting['date_posted']}\n"
+            text_content += f"Apply: {posting['link']}\n"
+            text_content += f"Source: {posting['repo']}\n\n"
         
-        html_content += """
-            <hr>
-            <p style="color: #666; font-size: 12px;">Good luck with your applications!</p>
-        </body>
-        </html>
-        """
+        text_content += "Good luck with your applications!"
         
-        msg.attach(MIMEText(html_content, 'html'))
+        msg.attach(MIMEText(text_content, 'plain'))
         
         # Send email
         try:
